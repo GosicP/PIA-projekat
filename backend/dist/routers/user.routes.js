@@ -9,5 +9,7 @@ const userRouter = express_1.default.Router();
 userRouter.route('/login').post((req, res) => new user_controller_1.UserController().login(req, res));
 userRouter.route('/register').post((req, res) => new user_controller_1.UserController().register(req, res));
 userRouter.route('/getDoctors').get((req, res) => new user_controller_1.UserController().getDoctors(req, res));
+userRouter.route('/findUsername').get((req, res) => new user_controller_1.UserController().findUsername(req, res));
+userRouter.route('/changePassword').post((req, res) => new user_controller_1.UserController().changePassword(req, res));
 exports.default = userRouter;
 //# sourceMappingURL=user.routes.js.map

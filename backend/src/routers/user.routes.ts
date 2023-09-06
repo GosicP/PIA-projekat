@@ -15,4 +15,16 @@ userRouter.route('/getDoctors').get(
     (req, res)=>new UserController().getDoctors(req, res)
 )
 
+userRouter.route('/findUsername').get(
+    (req, res)=>new UserController().findUsername(req, res)
+)
+
+userRouter.route('/changePassword').post(
+    (req, res)=>new UserController().changePassword(req, res)
+)
+
+userRouter.route('/searchDoctors').post(
+    (req, res)=>new UserController().searchDoctors(req, res)
+)
+
 export default userRouter;

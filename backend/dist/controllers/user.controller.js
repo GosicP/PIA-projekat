@@ -22,19 +22,33 @@ class UserController {
                 firstname: req.body.firstname,
                 lastname: req.body.lastname,
                 username: req.body.username,
-                password: req.body.username,
+                password: req.body.password,
                 adress: req.body.adress,
                 number: req.body.number,
                 email: req.body.email,
                 type: 0
             });
+            let passwordconf = req.body.passwordconf;
             user.save((err, resp) => {
-                if (err) {
+                if (err || user.password !== passwordconf) {
                     console.log(err);
                     res.status(400).json({ "message": "error" });
                 }
+                else if (user.password !== passwordconf) {
+                    res.json({ "message": "notconf" });
+                }
                 else
                     res.json({ "message": "ok" });
+            });
+        };
+        this.changePassword = (req, res) => {
+            let password = req.body.password;
+            let username = req.body.username;
+            user_1.default.findOneAndUpdate({ 'username': username }, { $set: { 'password': password } }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json({ message: "changed" });
             });
         };
         this.getDoctors = (req, res) => {
@@ -44,6 +58,14 @@ class UserController {
                 else
                     res.json(users);
             }); //{} je za uslove
+        };
+        this.findUsername = (req, res) => {
+            user_1.default.find({}, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json(users);
+            });
         };
     }
 }
