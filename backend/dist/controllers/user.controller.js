@@ -67,6 +67,163 @@ class UserController {
                     res.json(users);
             });
         };
+        this.searchDoctors = (req, res) => {
+            let firstname = req.body.firstname;
+            let lastname = req.body.lastname;
+            let specialization = req.body.specialization;
+            let branch = req.body.branch;
+            if (firstname === '' || firstname == '') {
+                firstname = null;
+            }
+            if (lastname === '' || lastname == '') {
+                lastname = null;
+            }
+            if (specialization === '' || specialization == '') {
+                specialization = null;
+            }
+            if (branch === '' || branch == '') {
+                branch = null;
+            }
+            if (firstname != null && lastname != null && specialization != null && branch != null) {
+                //console.log("trazim po sva 3")
+                user_1.default.find({ 'firstname': firstname, 'lastname': lastname, 'specialization': specialization, 'branch': branch, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (firstname != null && lastname != null && specialization != null) {
+                user_1.default.find({ 'firstname': firstname, 'lastname': lastname, 'specialization': specialization, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (firstname != null && lastname != null && branch != null) {
+                user_1.default.find({ 'firstname': firstname, 'lastname': lastname, 'branch': branch, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (firstname != null && specialization != null && branch != null) {
+                user_1.default.find({ 'firstname': firstname, 'specialization': specialization, 'branch': branch, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (lastname != null && specialization != null && branch != null) {
+                user_1.default.find({ 'lastname': lastname, 'specialization': specialization, 'branch': branch, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (firstname != null && lastname != null) {
+                //console.log("trazim ime prezime")
+                user_1.default.find({ 'firstname': firstname, 'lastname': lastname, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (firstname != null && specialization != null) {
+                //console.log("trazim ime specijalizaciju")
+                user_1.default.find({ 'firstname': firstname, 'specialization': specialization, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (firstname != null && branch != null) {
+                user_1.default.find({ 'firstname': firstname, 'branch': branch, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (lastname != null && specialization != null) {
+                //console.log("trazim prezime specijalizaciju")
+                user_1.default.find({ 'lastname': lastname, 'specialization': specialization, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (lastname != null && branch != null) {
+                user_1.default.find({ 'lastname': lastname, 'branch': branch, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (branch != null && specialization != null) {
+                user_1.default.find({ 'branch': branch, 'specialization': specialization, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (firstname != null) {
+                //console.log("trazim po imenu")
+                user_1.default.find({ 'firstname': firstname, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+                //console.log("trazim po imenu")
+            }
+            else if (lastname != null) {
+                //console.log("trazim po prezimenu")
+                user_1.default.find({ 'lastname': lastname, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (specialization != null) {
+                //console.log("trazim po specijalizaciji")
+                user_1.default.find({ 'specialization': specialization, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+            else if (branch != null) {
+                user_1.default.find({ 'branch': branch, 'type': 1 }, (err, users) => {
+                    if (err)
+                        console.log(err);
+                    else
+                        res.json(users);
+                });
+            }
+        };
+        this.getPatient = (req, res) => {
+            let username = req.body.username;
+            let password = req.body.password;
+            user_1.default.findOne({ 'username': username }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else {
+                    res.json(users);
+                }
+            });
+        };
     }
 }
 exports.UserController = UserController;

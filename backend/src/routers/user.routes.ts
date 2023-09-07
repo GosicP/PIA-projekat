@@ -27,4 +27,8 @@ userRouter.route('/searchDoctors').post(
     (req, res)=>new UserController().searchDoctors(req, res)
 )
 
+userRouter.route('/getPatient').post(
+    (req, res)=>new UserController().getPatient(req, res)
+)
+
 export default userRouter;
