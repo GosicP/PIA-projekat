@@ -273,6 +273,16 @@ class UserController {
                 }
             });
         };
+        this.getScheduledAppointments = (req, res) => {
+            let usernamePatient = req.body.usernamePatient;
+            scheduled_1.default.find({ 'usernamePatient': usernamePatient }, (err, pats) => {
+                if (err)
+                    console.log(err);
+                else {
+                    res.json(pats);
+                }
+            });
+        };
     }
 }
 exports.UserController = UserController;

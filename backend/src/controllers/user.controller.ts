@@ -228,4 +228,13 @@ export class UserController{
         })
     }
 
+    getScheduledAppointments = (req: express.Request, res: express.Response) => {
+        let usernamePatient = req.body.usernamePatient
+
+        ScheduledModel.find({'usernamePatient' : usernamePatient}, (err, pats)=>{
+            if(err) console.log(err);
+            else {res.json(pats)}
+        })
+    }
+
 }

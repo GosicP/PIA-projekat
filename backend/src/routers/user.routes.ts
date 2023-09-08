@@ -47,4 +47,8 @@ userRouter.route('/findDoctorAppointments').post(
     (req,res) => new UserController().findDoctorAppointments(req, res)
 )
 
+userRouter.route('/getScheduledAppointments').post(
+    (req, res) => new UserController().getScheduledAppointments(req, res)
+)
+
 export default userRouter;
