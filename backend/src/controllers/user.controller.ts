@@ -1,5 +1,7 @@
 import express from 'express'
 import UserModel from '../models/user'
+import AppointmentModel from '../models/appointment'
+import ScheduledModel from '../models/scheduled'
 
 
 
@@ -179,4 +181,51 @@ export class UserController{
 
 
     }
+
+    getDoctor =  (req: express.Request, res: express.Response)=>{
+        let username = req.body.username;
+
+        UserModel.findOne({'username': username}, (err, users)=>{
+            if(err) console.log(err);
+            else {res.json(users)}
+        })
+
+
+    }
+
+    getAppointments = (req: express.Request, res: express.Response)=>{
+        let specialization = req.body.specialization
+
+        AppointmentModel.find({'specializationApp' : specialization}, (err, appts)=>{
+            if(err) console.log(err);
+            else {res.json(appts)}
+        })
+    }
+
+    scheduleAppointment = (req: express.Request, res: express.Response) => {
+        let appointment = new ScheduledModel({
+            usernamePatient : req.body.usernamePatient,
+            usernameDoctor : req.body.usernameDoctor,
+            appointmentName : req.body.appointmentName,
+            time : req.body.time,
+            date : req.body.date
+        })
+
+        appointment.save((err, resp)=>{
+            if(err) {console.log(err);
+                res.status(400).json({"message": "error"})
+            }
+            else res.json({"message": "ok"})
+        })
+    }
+
+    findDoctorAppointments = (req : express.Request, res: express.Response) => {
+        let usernameDoctor = req.body.usernameDoctor
+
+        ScheduledModel.find({'usernameDoctor' : usernameDoctor}, (err, docs)=>{
+            if(err) console.log(err);
+            else {res.json(docs)}
+        })
+    }
+
 }

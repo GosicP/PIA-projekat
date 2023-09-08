@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const user_1 = __importDefault(require("../models/user"));
+const appointment_1 = __importDefault(require("../models/appointment"));
+const scheduled_1 = __importDefault(require("../models/scheduled"));
 class UserController {
     constructor() {
         this.login = (req, res) => {
@@ -221,6 +223,53 @@ class UserController {
                     console.log(err);
                 else {
                     res.json(users);
+                }
+            });
+        };
+        this.getDoctor = (req, res) => {
+            let username = req.body.username;
+            user_1.default.findOne({ 'username': username }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else {
+                    res.json(users);
+                }
+            });
+        };
+        this.getAppointments = (req, res) => {
+            let specialization = req.body.specialization;
+            appointment_1.default.find({ 'specializationApp': specialization }, (err, appts) => {
+                if (err)
+                    console.log(err);
+                else {
+                    res.json(appts);
+                }
+            });
+        };
+        this.scheduleAppointment = (req, res) => {
+            let appointment = new scheduled_1.default({
+                usernamePatient: req.body.usernamePatient,
+                usernameDoctor: req.body.usernameDoctor,
+                appointmentName: req.body.appointmentName,
+                time: req.body.time,
+                date: req.body.date
+            });
+            appointment.save((err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else
+                    res.json({ "message": "ok" });
+            });
+        };
+        this.findDoctorAppointments = (req, res) => {
+            let usernameDoctor = req.body.usernameDoctor;
+            scheduled_1.default.find({ 'usernameDoctor': usernameDoctor }, (err, docs) => {
+                if (err)
+                    console.log(err);
+                else {
+                    res.json(docs);
                 }
             });
         };

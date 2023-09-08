@@ -31,4 +31,20 @@ userRouter.route('/getPatient').post(
     (req, res)=>new UserController().getPatient(req, res)
 )
 
+userRouter.route('/getDoctor').post(
+    (req, res)=>new UserController().getDoctor(req, res)
+)
+
+userRouter.route('/getAppointments').post(
+    (req, res)=>new UserController().getAppointments(req, res)
+)
+
+userRouter.route('/scheduleAppointment').post(
+    (req, res)=>new UserController().scheduleAppointment(req, res)
+)
+
+userRouter.route('/findDoctorAppointments').post(
+    (req,res) => new UserController().findDoctorAppointments(req, res)
+)
+
 export default userRouter;
