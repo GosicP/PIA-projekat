@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -280,6 +289,101 @@ class UserController {
                     console.log(err);
                 else {
                     res.json(pats);
+                }
+            });
+        };
+        this.findScheduledAppointmentAndDelete = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let usernamePatient = req.body.usernamePatient;
+            let usernameDoctor = req.body.usernameDoctor;
+            let appointmentName = req.body.appointmentName;
+            let time = req.body.time;
+            let date = req.body.date;
+            // try{
+            // const entry = await ScheduledModel.findOne({'usernamePatient' : usernamePatient, 'usernameDoctor' : usernameDoctor, 'appointmentName' : appointmentName, 'time' : time, 'date' : date})
+            // if (!entry) {
+            //     console.log('Entry not found');
+            //     return;
+            // }
+            // const entryId = entry._id;
+            // await ScheduledModel.findByIdAndDelete(entryId);
+            // console.log(`Entry with ID ${entryId} deleted successfully.`);
+            // }catch (error) {
+            //     console.error('Error:', error);
+            // }
+            scheduled_1.default.deleteOne({ 'usernamePatient': usernamePatient, 'usernameDoctor': usernameDoctor, 'appointmentName': appointmentName, 'time': time, 'date': date }, (err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else
+                    res.json({ "message": "ok" });
+            });
+        });
+        this.findPatientAppointments = (req, res) => {
+            let usernamePatient = req.body.usernamePatient;
+            scheduled_1.default.find({ 'usernamePatient': usernamePatient }, (err, docs) => {
+                if (err)
+                    console.log(err);
+                else {
+                    res.json(docs);
+                }
+            });
+        };
+        this.changeAppointmentChoice = (req, res) => {
+            let usernameDoctor = req.body.usernameDoctor;
+            let appointment = {
+                specializationApp: req.body.specializationApp,
+                AppointmentName: req.body.AppointmentName,
+                Duration: req.body.Duration,
+                Price: req.body.Price,
+                isChosen: req.body.isChosen
+            };
+            // Check if the appointment already exists for the given doctor
+            user_1.default.findOne({ 'username': usernameDoctor, 'appointmentsChosen': { $elemMatch: appointment } }, (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    if (result) {
+                        // Appointment already exists
+                        res.json({ message: "Appointment already exists" });
+                    }
+                    else {
+                        // Appointment doesn't exist, add it to the array
+                        user_1.default.findOneAndUpdate({ 'username': usernameDoctor }, { $push: { 'appointmentsChosen': appointment } }, (err, users) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            else {
+                                res.json({ message: "Appointment added" });
+                            }
+                        });
+                    }
+                }
+            });
+        };
+        this.removeAppointment = (req, res) => {
+            let usernameDoctor = req.body.usernameDoctor;
+            let appointment = {
+                specializationApp: req.body.specializationApp,
+                AppointmentName: req.body.AppointmentName,
+                Duration: req.body.Duration,
+                Price: req.body.Price,
+                isChosen: req.body.isChosen
+            };
+            // Remove the appointment from the array
+            user_1.default.findOneAndUpdate({ 'username': usernameDoctor }, { $pull: { 'appointmentsChosen': appointment } }, { new: true }, (err, users) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ message: "An error occurred while removing the appointment." });
+                }
+                else {
+                    if (users) {
+                        res.json({ message: "Appointment removed", updatedUser: users });
+                    }
+                    else {
+                        res.json({ message: "Doctor not found" });
+                    }
                 }
             });
         };

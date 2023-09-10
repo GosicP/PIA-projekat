@@ -17,6 +17,9 @@ let Appointment = new Schema({
     },
     Price: {
         type: Number
+    },
+    isChosen: {
+        type: Boolean
     }
 });
 exports.default = mongoose_1.default.model('AppointmentModel', Appointment, 'appointments');

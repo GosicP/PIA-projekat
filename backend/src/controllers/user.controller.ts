@@ -237,4 +237,112 @@ export class UserController{
         })
     }
 
-}
+    findScheduledAppointmentAndDelete = async (req: express.Request, res: express.Response)=>{
+        let usernamePatient = req.body.usernamePatient
+        let usernameDoctor = req.body.usernameDoctor
+        let appointmentName = req.body.appointmentName
+        let time = req.body.time
+        let date = req.body.date
+        // try{
+        // const entry = await ScheduledModel.findOne({'usernamePatient' : usernamePatient, 'usernameDoctor' : usernameDoctor, 'appointmentName' : appointmentName, 'time' : time, 'date' : date})
+
+        // if (!entry) {
+        //     console.log('Entry not found');
+        //     return;
+        // }
+
+        // const entryId = entry._id;
+
+        // await ScheduledModel.findByIdAndDelete(entryId);
+
+        // console.log(`Entry with ID ${entryId} deleted successfully.`);
+        // }catch (error) {
+        //     console.error('Error:', error);
+        // }
+
+        ScheduledModel.deleteOne({'usernamePatient' : usernamePatient, 'usernameDoctor' : usernameDoctor, 'appointmentName' : appointmentName, 'time' : time, 'date' : date}, (err, resp)=>{
+            if(err) {console.log(err);
+                res.status(400).json({"message": "error"})
+            }
+            else res.json({"message": "ok"})
+        })
+    }
+
+    findPatientAppointments = (req : express.Request, res: express.Response) => {
+        let usernamePatient = req.body.usernamePatient
+
+        ScheduledModel.find({'usernamePatient' : usernamePatient}, (err, docs)=>{
+            if(err) console.log(err);
+            else {res.json(docs)}
+        })
+    }
+
+    changeAppointmentChoice = (req: express.Request, res: express.Response) => {
+        let usernameDoctor = req.body.usernameDoctor;
+        let appointment = {
+            specializationApp: req.body.specializationApp,
+            AppointmentName: req.body.AppointmentName,
+            Duration: req.body.Duration,
+            Price: req.body.Price,
+            isChosen: req.body.isChosen
+        };
+
+        // Check if the appointment already exists for the given doctor
+        UserModel.findOne(
+            { 'username': usernameDoctor, 'appointmentsChosen': { $elemMatch: appointment } },
+            (err, result) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    if (result) {
+                        // Appointment already exists
+                        res.json({ message: "Appointment already exists" });
+                    } else {
+                        // Appointment doesn't exist, add it to the array
+                        UserModel.findOneAndUpdate(
+                            { 'username': usernameDoctor },
+                            { $push: { 'appointmentsChosen': appointment } },
+                            (err, users) => {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    res.json({ message: "Appointment added" });
+                                }
+                            }
+                        );
+                    }
+                }
+            }
+        );
+            }
+
+    removeAppointment = (req: express.Request, res: express.Response) => {
+        let usernameDoctor = req.body.usernameDoctor;
+        let appointment = {
+            specializationApp: req.body.specializationApp,
+            AppointmentName: req.body.AppointmentName,
+            Duration: req.body.Duration,
+            Price: req.body.Price,
+            isChosen: req.body.isChosen
+        };
+    
+        // Remove the appointment from the array
+        UserModel.findOneAndUpdate(
+            { 'username': usernameDoctor },
+            { $pull: { 'appointmentsChosen': appointment } },
+            { new: true },
+            (err, users) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ message: "An error occurred while removing the appointment." });
+                } else {
+                    if (users) {
+                        res.json({ message: "Appointment removed"});
+                    } else {
+                        res.json({ message: "Doctor not found" });
+                    }
+                }
+            }
+        );
+    }
+} 

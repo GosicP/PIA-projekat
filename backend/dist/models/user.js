@@ -38,6 +38,9 @@ let User = new Schema({
     },
     type: {
         type: Number
+    },
+    appointmentsChosen: {
+        type: Array
     }
 });
 exports.default = mongoose_1.default.model('UserModel', User, 'users');

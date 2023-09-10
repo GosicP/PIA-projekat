@@ -35,6 +35,9 @@ let User = new Schema({
     },
     type: {
         type: Number
+    },
+    appointmentsChosen :{ 
+        type: Array
     }
 })
 

@@ -51,4 +51,20 @@ userRouter.route('/getScheduledAppointments').post(
     (req, res) => new UserController().getScheduledAppointments(req, res)
 )
 
+userRouter.route('/findScheduledAppointmentAndDelete').post(
+    (req, res) => new UserController().findScheduledAppointmentAndDelete(req, res)
+)
+
+userRouter.route('/findPatientAppointments').post(
+    (req,res) => new UserController().findPatientAppointments(req, res)
+)
+
+userRouter.route('/changeAppointmentChoice').post(
+    (req, res) => new UserController().changeAppointmentChoice(req, res)
+)
+
+userRouter.route('/removeAppointment').post(
+    (req, res) => new UserController().removeAppointment(req, res)
+)
+
 export default userRouter;
