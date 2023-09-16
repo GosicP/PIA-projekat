@@ -17,6 +17,9 @@ let Appointment = new Schema({
     },
     isChosen : {
         type: Boolean
+    },
+    isApproved: {
+        type: Boolean
     }
 })
 

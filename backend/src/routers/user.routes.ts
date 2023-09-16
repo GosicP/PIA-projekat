@@ -67,4 +67,32 @@ userRouter.route('/removeAppointment').post(
     (req, res) => new UserController().removeAppointment(req, res)
 )
 
+userRouter.route('/getReports').post(
+    (req, res) => new UserController().getReports(req, res)
+)
+
+userRouter.route('/addReport').post(
+    (req, res) => new UserController().addReport(req, res)
+)
+
+userRouter.route('/findAppointmentFull').post(
+    (req, res) => new UserController().findAppointmentFull(req, res)
+)
+
+userRouter.route('/addAppointment').post(
+    (req, res) => new UserController().addAppointment(req, res)
+)
+
+userRouter.route('/getPatients').get(
+    (req, res) => new UserController().getPatients(req, res)
+)
+
+userRouter.route('/updateUser').post(
+    (req, res) => new UserController().updateUser(req, res)
+)
+
+userRouter.route('/updateDoctor').post(
+    (req, res) => new UserController().updateDoctor(req, res)
+)
+
 export default userRouter;

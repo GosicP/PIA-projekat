@@ -16,6 +16,7 @@ exports.UserController = void 0;
 const user_1 = __importDefault(require("../models/user"));
 const appointment_1 = __importDefault(require("../models/appointment"));
 const scheduled_1 = __importDefault(require("../models/scheduled"));
+const report_1 = __importDefault(require("../models/report"));
 class UserController {
     constructor() {
         this.login = (req, res) => {
@@ -298,18 +299,6 @@ class UserController {
             let appointmentName = req.body.appointmentName;
             let time = req.body.time;
             let date = req.body.date;
-            // try{
-            // const entry = await ScheduledModel.findOne({'usernamePatient' : usernamePatient, 'usernameDoctor' : usernameDoctor, 'appointmentName' : appointmentName, 'time' : time, 'date' : date})
-            // if (!entry) {
-            //     console.log('Entry not found');
-            //     return;
-            // }
-            // const entryId = entry._id;
-            // await ScheduledModel.findByIdAndDelete(entryId);
-            // console.log(`Entry with ID ${entryId} deleted successfully.`);
-            // }catch (error) {
-            //     console.error('Error:', error);
-            // }
             scheduled_1.default.deleteOne({ 'usernamePatient': usernamePatient, 'usernameDoctor': usernameDoctor, 'appointmentName': appointmentName, 'time': time, 'date': date }, (err, resp) => {
                 if (err) {
                     console.log(err);
@@ -379,12 +368,129 @@ class UserController {
                 }
                 else {
                     if (users) {
-                        res.json({ message: "Appointment removed", updatedUser: users });
+                        res.json({ message: "Appointment removed" });
                     }
                     else {
                         res.json({ message: "Doctor not found" });
                     }
                 }
+            });
+        };
+        this.getReports = (req, res) => {
+            let usernamePatient = req.body.usernamePatient;
+            report_1.default.find({ 'usernamePatient': usernamePatient }, (err, docs) => {
+                if (err)
+                    console.log(err);
+                else {
+                    res.json(docs);
+                }
+            });
+        };
+        this.addReport = (req, res) => {
+            let report = new report_1.default({
+                usernamePatient: req.body.usernamePatient,
+                usernameDoctor: req.body.usernameDoctor,
+                firstnameDoctor: req.body.firstnameDoctor,
+                lastnameDoctor: req.body.lastnameDoctor,
+                time: req.body.time,
+                date: req.body.date,
+                specialization: req.body.specialization,
+                appointmentName: req.body.appointmentName,
+                reasonCome: req.body.reasonCome,
+                diagnosis: req.body.diagnosis,
+                therapy: req.body.therapy,
+                nextAppDate: req.body.nextAppDate
+            });
+            report.save((err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else
+                    res.json({ "message": "ok" });
+            });
+        };
+        this.findAppointmentFull = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            let usernamePatient = req.body.usernamePatient;
+            let usernameDoctor = req.body.usernameDoctor;
+            let appointmentName = req.body.appointmentName;
+            let time = req.body.time;
+            let date = req.body.date;
+            report_1.default.findOne({ 'usernamePatient': usernamePatient, 'usernameDoctor': usernameDoctor, 'appointmentName': appointmentName, 'time': time, 'date': date }, (err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "not ok" });
+                }
+                else {
+                    if (resp) {
+                        // Report found
+                        res.json({ "message": "ok" });
+                    }
+                    else {
+                        // Report not found
+                        res.json({ "message": "not ok" });
+                    }
+                }
+            });
+        });
+        this.addAppointment = (req, res) => {
+            let appointment = new appointment_1.default({
+                specializationApp: req.body.specialization,
+                AppointmentName: req.body.appointmentName,
+                Duration: req.body.appointmentDuration,
+                Price: req.body.appointmentPrice,
+                isChosen: "true",
+                isApproved: req.body.isApproved
+            });
+            appointment.save((err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else
+                    res.json({ "message": "ok" });
+            });
+        };
+        this.getPatients = (req, res) => {
+            user_1.default.find({ 'type': 0 }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json(users);
+            }); //{} je za uslove
+        };
+        this.updateUser = (req, res) => {
+            let username = req.body.username;
+            let firstname = req.body.firstname;
+            let lastname = req.body.lastname;
+            let adress = req.body.adress;
+            let email = req.body.email;
+            let number = req.body.number;
+            user_1.default.findOneAndUpdate({ 'username': username }, { $set: { 'firstname': firstname, 'lastname': lastname, 'adress': adress,
+                    'email': email, 'number': number } }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json({ message: "changed" });
+            });
+        };
+        this.updateDoctor = (req, res) => {
+            let username = req.body.username;
+            let firstname = req.body.firstname;
+            let lastname = req.body.lastname;
+            let adress = req.body.adress;
+            let email = req.body.email;
+            let number = req.body.number;
+            let specialization = req.body.specialization;
+            let branch = req.body.branch;
+            let licenceNr = req.body.licenceNr;
+            user_1.default.findOneAndUpdate({ 'username': username }, { $set: { 'firstname': firstname, 'lastname': lastname, 'adress': adress,
+                    'email': email, 'number': number, 'specialization': specialization,
+                    'branch': branch, 'licenceNr': licenceNr } }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json({ message: "changed" });
             });
         };
     }

@@ -9,6 +9,12 @@ let Report = new Schema({
     usernameDoctor: {
         type: String
     },
+    firstnameDoctor: {
+        type: String
+    },
+    lastnameDoctor: {
+        type: String
+    },
     time : {
         type: String
     },
@@ -24,10 +30,10 @@ let Report = new Schema({
     reasonCome: {
         type: String
     },
-    Diagnosis : {
+    diagnosis : {
         type: String
     },
-    Therapy : {
+    therapy : {
         type: String
     },
     nextAppDate : {

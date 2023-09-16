@@ -2,6 +2,7 @@ import express from 'express'
 import UserModel from '../models/user'
 import AppointmentModel from '../models/appointment'
 import ScheduledModel from '../models/scheduled'
+import ReportModel from '../models/report'
 
 
 
@@ -243,22 +244,6 @@ export class UserController{
         let appointmentName = req.body.appointmentName
         let time = req.body.time
         let date = req.body.date
-        // try{
-        // const entry = await ScheduledModel.findOne({'usernamePatient' : usernamePatient, 'usernameDoctor' : usernameDoctor, 'appointmentName' : appointmentName, 'time' : time, 'date' : date})
-
-        // if (!entry) {
-        //     console.log('Entry not found');
-        //     return;
-        // }
-
-        // const entryId = entry._id;
-
-        // await ScheduledModel.findByIdAndDelete(entryId);
-
-        // console.log(`Entry with ID ${entryId} deleted successfully.`);
-        // }catch (error) {
-        //     console.error('Error:', error);
-        // }
 
         ScheduledModel.deleteOne({'usernamePatient' : usernamePatient, 'usernameDoctor' : usernameDoctor, 'appointmentName' : appointmentName, 'time' : time, 'date' : date}, (err, resp)=>{
             if(err) {console.log(err);
@@ -345,4 +330,122 @@ export class UserController{
             }
         );
     }
-} 
+
+    getReports = (req: express.Request, res: express.Response) => {
+        let usernamePatient = req.body.usernamePatient
+
+        ReportModel.find({'usernamePatient' : usernamePatient}, (err, docs)=>{
+            if(err) console.log(err);
+            else {res.json(docs)}
+        })
+    }
+
+    addReport = (req: express.Request, res: express.Response) => {
+        let report = new ReportModel({
+            usernamePatient : req.body.usernamePatient,
+            usernameDoctor : req.body.usernameDoctor, 
+            firstnameDoctor : req.body.firstnameDoctor, 
+            lastnameDoctor : req.body.lastnameDoctor, 
+            time : req.body.time, 
+            date : req.body.date, 
+            specialization : req.body.specialization,
+            appointmentName : req.body.appointmentName, 
+            reasonCome : req.body.reasonCome, 
+            diagnosis : req.body.diagnosis, 
+            therapy : req.body.therapy,
+            nextAppDate : req.body.nextAppDate
+        })
+
+        report.save((err, resp)=>{
+            if(err) {console.log(err);
+                res.status(400).json({"message": "error"})
+            }
+            else res.json({"message": "ok"})
+        })
+    }
+
+    findAppointmentFull = async (req: express.Request, res: express.Response)=>{
+        let usernamePatient = req.body.usernamePatient
+        let usernameDoctor = req.body.usernameDoctor
+        let appointmentName = req.body.appointmentName
+        let time = req.body.time
+        let date = req.body.date
+
+        ReportModel.findOne({'usernamePatient' : usernamePatient, 'usernameDoctor' : usernameDoctor, 'appointmentName' : appointmentName, 'time' : time, 'date' : date}, (err, resp)=>{
+            if(err) {
+                console.log(err);
+                res.status(400).json({"message": "not ok"})
+            }else {
+                if (resp) {
+                    // Report found
+                    res.json({ "message": "ok" });
+                } else {
+                    // Report not found
+                    res.json({ "message": "not ok" });
+                }
+            }
+        })
+    }
+
+    addAppointment = (req: express.Request, res: express.Response) => {
+        let appointment = new AppointmentModel({
+         specializationApp : req.body.specialization,
+         AppointmentName : req.body.appointmentName,
+         Duration : req.body.appointmentDuration,
+         Price : req.body.appointmentPrice,
+         isChosen : "true",
+         isApproved : req.body.isApproved
+        })
+
+        appointment.save((err, resp)=>{
+            if(err) {console.log(err);
+                res.status(400).json({"message": "error"})
+            }
+            else res.json({"message": "ok"})
+        })
+
+    }
+
+    getPatients = (req: express.Request, res: express.Response)=>{
+        UserModel.find({'type' : 0}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json(users)
+        }) //{} je za uslove
+    }
+
+    updateUser = (req: express.Request, res: express.Response)=>{
+        let username = req.body.username 
+        let firstname = req.body.firstname
+        let lastname = req.body.lastname
+        let adress = req.body.adress
+        let email = req.body.email
+        let number = req.body.number
+
+        UserModel.findOneAndUpdate({'username' : username},
+         {$set: {'firstname' : firstname, 'lastname' : lastname, 'adress' : adress,
+                'email' : email, 'number' : number}}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json({message : "changed"})
+        })
+     }
+
+     updateDoctor = (req: express.Request, res: express.Response)=>{
+        let username = req.body.username 
+        let firstname = req.body.firstname
+        let lastname = req.body.lastname
+        let adress = req.body.adress
+        let email = req.body.email
+        let number = req.body.number
+        let specialization = req.body.specialization
+        let branch = req.body.branch
+        let licenceNr = req.body.licenceNr
+
+        UserModel.findOneAndUpdate({'username' : username},
+         {$set: {'firstname' : firstname, 'lastname' : lastname, 'adress' : adress,
+                'email' : email, 'number' : number, 'specialization' : specialization,
+                'branch' : branch, 'licenceNr' : licenceNr}}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json({message : "changed"})
+        })
+     }
+    }
