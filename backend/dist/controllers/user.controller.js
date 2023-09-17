@@ -17,6 +17,7 @@ const user_1 = __importDefault(require("../models/user"));
 const appointment_1 = __importDefault(require("../models/appointment"));
 const scheduled_1 = __importDefault(require("../models/scheduled"));
 const report_1 = __importDefault(require("../models/report"));
+const specialization_1 = __importDefault(require("../models/specialization"));
 class UserController {
     constructor() {
         this.login = (req, res) => {
@@ -38,7 +39,9 @@ class UserController {
                 adress: req.body.adress,
                 number: req.body.number,
                 email: req.body.email,
-                type: 0
+                type: 0,
+                isApproved: false,
+                isRejected: false
             });
             let passwordconf = req.body.passwordconf;
             user.save((err, resp) => {
@@ -491,6 +494,127 @@ class UserController {
                     console.log(err);
                 else
                     res.json({ message: "changed" });
+            });
+        };
+        this.deleteUser = (req, res) => {
+            let username = req.body.username;
+            user_1.default.deleteOne({ 'username': username }, (err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else
+                    res.json({ "message": "ok" });
+            });
+        };
+        this.registerDoctor = (req, res) => {
+            let user = new user_1.default({
+                firstname: req.body.firstname,
+                lastname: req.body.lastname,
+                username: req.body.username,
+                password: req.body.password,
+                adress: req.body.adress,
+                number: req.body.number,
+                email: req.body.email,
+                specialization: req.body.specialization,
+                branch: req.body.branch,
+                licenceNr: req.body.licenceNr,
+                type: 1,
+                isApproved: true,
+                isRejected: false
+            });
+            let passwordconf = req.body.passwordconf;
+            user.save((err, resp) => {
+                if (err || user.password !== passwordconf) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else if (user.password !== passwordconf) {
+                    res.json({ "message": "notconf" });
+                }
+                else
+                    res.json({ "message": "ok" });
+            });
+        };
+        this.findPendingRequests = (req, res) => {
+            user_1.default.find({ 'isApproved': false, 'isRejected': false }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json(users);
+            });
+        };
+        this.approveUser = (req, res) => {
+            let username = req.body.username;
+            user_1.default.findOneAndUpdate({ 'username': username }, { $set: { 'isApproved': true, 'isRejected': false } }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json({ message: "changed" });
+            });
+        };
+        this.rejectUser = (req, res) => {
+            let username = req.body.username;
+            user_1.default.findOneAndUpdate({ 'username': username }, { $set: { 'isApproved': false, 'isRejected': true } }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json({ message: "changed" });
+            });
+        };
+        this.getSpecializations = (req, res) => {
+            specialization_1.default.find({}, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json(users);
+            });
+        };
+        this.getAppointmentsWaiting = (req, res) => {
+            appointment_1.default.find({ 'isApproved': false }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json(users);
+            });
+        };
+        this.approveAppointment = (req, res) => {
+            let specializationApp = req.body.specialization;
+            let AppointmentName = req.body.appointmentName;
+            let Duration = req.body.appointmentDuration;
+            let Price = req.body.appointmentPrice;
+            appointment_1.default.findOneAndUpdate({ 'specializationApp': specializationApp, 'AppointmentName': AppointmentName, 'Duration': Duration, 'Price': Price }, { $set: { 'isApproved': true } }, (err, users) => {
+                if (err)
+                    console.log(err);
+                else
+                    res.json({ message: "changed" });
+            });
+        };
+        this.rejectAppointment = (req, res) => {
+            let specializationApp = req.body.specialization;
+            let AppointmentName = req.body.appointmentName;
+            let Duration = req.body.appointmentDuration;
+            let Price = req.body.appointmentPrice;
+            appointment_1.default.deleteOne({ 'specializationApp': specializationApp, 'AppointmentName': AppointmentName, 'Duration': Duration, 'Price': Price }, (err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else
+                    res.json({ "message": "ok" });
+            });
+        };
+        this.addSpecialization = (req, res) => {
+            let specialization = new specialization_1.default({
+                specializationName: req.body.specializationName
+            });
+            specialization.save((err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else
+                    res.json({ "message": "ok" });
             });
         };
     }

@@ -95,4 +95,44 @@ userRouter.route('/updateDoctor').post(
     (req, res) => new UserController().updateDoctor(req, res)
 )
 
+userRouter.route('/deleteUser').post(
+    (req, res) => new UserController().deleteUser(req, res)
+)
+
+userRouter.route('/registerDoctor').post(
+    (req, res) => new UserController().registerDoctor(req, res)
+)
+
+userRouter.route('/findPendingRequests').get(
+    (req, res) => new UserController().findPendingRequests(req, res)
+)
+
+userRouter.route('/approveUser').post(
+    (req, res) => new UserController().approveUser(req, res)
+)
+
+userRouter.route('/rejectUser').post(
+    (req, res) => new UserController().rejectUser(req, res)
+)
+
+userRouter.route('/getSpecializations').get(
+    (req, res) => new UserController().getSpecializations(req, res)
+)
+
+userRouter.route('/getAppointmentsWaiting').get(
+    (req, res) => new UserController().getAppointmentsWaiting(req, res)
+)
+
+userRouter.route('/approveAppointment').post(
+    (req, res) => new UserController().approveAppointment(req, res)
+)
+
+userRouter.route('/rejectAppointment').post(
+    (req, res) => new UserController().rejectAppointment(req, res)
+)
+
+userRouter.route('/addSpecialization').post(
+    (req, res) => new UserController().addSpecialization(req, res)
+)
+
 export default userRouter;

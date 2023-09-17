@@ -41,6 +41,12 @@ let User = new Schema({
     },
     appointmentsChosen: {
         type: Array
+    },
+    isApproved: {
+        type: Boolean
+    },
+    isRejected: {
+        type: Boolean
     }
 });
 exports.default = mongoose_1.default.model('UserModel', User, 'users');

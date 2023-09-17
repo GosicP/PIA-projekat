@@ -3,6 +3,8 @@ import UserModel from '../models/user'
 import AppointmentModel from '../models/appointment'
 import ScheduledModel from '../models/scheduled'
 import ReportModel from '../models/report'
+import SpecializationModel from '../models/specialization'
+import { truncate } from 'fs/promises'
 
 
 
@@ -27,7 +29,9 @@ export class UserController{
             adress: req.body.adress,
             number: req.body.number,
             email: req.body.email,
-            type: 0
+            type: 0,
+            isApproved : false,
+            isRejected : false
         })
         
         let passwordconf = req.body.passwordconf;
@@ -448,4 +452,121 @@ export class UserController{
             else res.json({message : "changed"})
         })
      }
+
+     deleteUser = (req: express.Request, res: express.Response)=>{
+        let username = req.body.username
+
+        UserModel.deleteOne({'username' : username}, (err, resp)=>{
+            if(err) {console.log(err);
+                res.status(400).json({"message": "error"})
+            }
+            else res.json({"message": "ok"})
+        })
+     }
+     
+     registerDoctor = (req: express.Request, res: express.Response)=>{
+        let user = new UserModel({
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            username: req.body.username,
+            password: req.body.password,
+            adress: req.body.adress,
+            number: req.body.number,
+            email: req.body.email,
+            specialization : req.body.specialization,
+            branch : req.body.branch,
+            licenceNr : req.body.licenceNr,
+            type: 1,
+            isApproved : true,
+            isRejected : false
+        })
+        
+        let passwordconf = req.body.passwordconf;
+
+        user.save((err, resp)=>{
+            if(err || user.password!==passwordconf){ console.log(err);
+            res.status(400).json({"message": "error"})
+        }else if(user.password!==passwordconf){
+             res.json({"message" : "notconf"})
+        }else res.json({"message": "ok"})
+        })
     }
+
+     findPendingRequests = (req: express.Request, res: express.Response)=>{
+        UserModel.find({'isApproved' : false, 'isRejected' : false}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json(users)
+        })
+    }
+
+    approveUser  = (req: express.Request, res: express.Response)=>{
+        let username = req.body.username 
+
+        UserModel.findOneAndUpdate({'username' : username}, {$set: {'isApproved' : true, 'isRejected' : false}}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json({message : "changed"})
+        })
+    }
+
+    rejectUser  = (req: express.Request, res: express.Response)=>{
+        let username = req.body.username 
+
+        UserModel.findOneAndUpdate({'username' : username}, {$set: {'isApproved' : false, 'isRejected' : true}}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json({message : "changed"})
+        })
+    }
+
+    getSpecializations = (req: express.Request, res: express.Response)=>{
+        SpecializationModel.find({}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json(users)
+        })
+    }
+
+    getAppointmentsWaiting  = (req: express.Request, res: express.Response)=>{
+        AppointmentModel.find({'isApproved' : false}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json(users)
+        })
+    }
+
+    approveAppointment  = (req: express.Request, res: express.Response)=>{
+         let specializationApp = req.body.specialization
+         let AppointmentName = req.body.appointmentName
+         let Duration = req.body.appointmentDuration
+         let Price = req.body.appointmentPrice
+
+        AppointmentModel.findOneAndUpdate({'specializationApp' : specializationApp, 'AppointmentName' : AppointmentName, 'Duration' : Duration, 'Price' : Price}, {$set: {'isApproved' : true}}, (err, users)=>{
+            if(err) console.log(err);
+            else res.json({message : "changed"})
+        })
+    }
+
+    rejectAppointment = (req: express.Request, res: express.Response)=> {
+            let specializationApp = req.body.specialization
+            let AppointmentName = req.body.appointmentName
+            let Duration = req.body.appointmentDuration
+            let Price = req.body.appointmentPrice
+
+            AppointmentModel.deleteOne({'specializationApp' : specializationApp, 'AppointmentName' : AppointmentName, 'Duration' : Duration, 'Price' : Price}, (err, resp)=>{
+                if(err) {console.log(err);
+                    res.status(400).json({"message": "error"})
+                }
+                else res.json({"message": "ok"})
+            })
+    }
+
+    addSpecialization = (req: express.Request, res: express.Response)=> {
+        let specialization = new SpecializationModel({
+            specializationName : req.body.specializationName
+        })
+
+        specialization.save((err, resp)=>{
+            if(err) {console.log(err);
+                res.status(400).json({"message": "error"})
+            }
+            else res.json({"message": "ok"})
+        })
+    }
+}

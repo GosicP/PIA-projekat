@@ -38,6 +38,12 @@ let User = new Schema({
     },
     appointmentsChosen :{ 
         type: Array
+    },
+    isApproved : {
+        type : Boolean
+    },
+    isRejected : {
+        type: Boolean
     }
 })
 
