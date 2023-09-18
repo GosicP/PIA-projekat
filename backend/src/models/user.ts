@@ -44,6 +44,9 @@ let User = new Schema({
     },
     isRejected : {
         type: Boolean
+    },
+    avatar: {
+        type: String
     }
 })
 

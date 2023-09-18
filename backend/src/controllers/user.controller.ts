@@ -5,6 +5,8 @@ import ScheduledModel from '../models/scheduled'
 import ReportModel from '../models/report'
 import SpecializationModel from '../models/specialization'
 import { truncate } from 'fs/promises'
+import path from 'path'
+import fs from 'fs'
 
 
 
@@ -31,9 +33,15 @@ export class UserController{
             email: req.body.email,
             type: 0,
             isApproved : false,
-            isRejected : false
+            isRejected : false,
+            avatar : req.body.avatar
         })
-        
+        let profilePic = user.avatar
+        if(!profilePic) {
+            const pathPic = path.join(__dirname, '../../../frontend/app/src/assets/default-picture.jpg')
+            profilePic = fs.readFileSync(pathPic, 'base64')
+        }
+        user.avatar = profilePic
         let passwordconf = req.body.passwordconf;
 
         user.save((err, resp)=>{
@@ -294,9 +302,11 @@ export class UserController{
                             (err, users) => {
                                 if (err) {
                                     console.log(err);
-                                } else {
+                                } else if(users){
                                     res.json({ message: "Appointment added" });
-                                }
+                                }else {
+                                    res.status(404).json({ message: "User not found or appointment not updated" });
+                                  }
                             }
                         );
                     }
@@ -310,8 +320,8 @@ export class UserController{
         let appointment = {
             specializationApp: req.body.specializationApp,
             AppointmentName: req.body.AppointmentName,
-            Duration: req.body.Duration,
-            Price: req.body.Price,
+            //Duration: req.body.Duration,
+            //Price: req.body.Price,
             isChosen: req.body.isChosen
         };
     
@@ -424,10 +434,18 @@ export class UserController{
         let adress = req.body.adress
         let email = req.body.email
         let number = req.body.number
+        let avatar = req.body.avatar
+
+        let profilePic = avatar
+        if(!profilePic) {
+            const pathPic = path.join(__dirname, '../../../frontend/app/src/assets/default-picture.jpg')
+            profilePic = fs.readFileSync(pathPic, 'base64')
+        }
+        avatar = profilePic
 
         UserModel.findOneAndUpdate({'username' : username},
          {$set: {'firstname' : firstname, 'lastname' : lastname, 'adress' : adress,
-                'email' : email, 'number' : number}}, (err, users)=>{
+                'email' : email, 'number' : number, 'avatar' : avatar}}, (err, users)=>{
             if(err) console.log(err);
             else res.json({message : "changed"})
         })
@@ -443,11 +461,19 @@ export class UserController{
         let specialization = req.body.specialization
         let branch = req.body.branch
         let licenceNr = req.body.licenceNr
+        let avatar = req.body.avatar
+
+        let profilePic = avatar
+        if(!profilePic) {
+            const pathPic = path.join(__dirname, '../../../frontend/app/src/assets/default-picture.jpg')
+            profilePic = fs.readFileSync(pathPic, 'base64')
+        }
+        avatar = profilePic
 
         UserModel.findOneAndUpdate({'username' : username},
          {$set: {'firstname' : firstname, 'lastname' : lastname, 'adress' : adress,
                 'email' : email, 'number' : number, 'specialization' : specialization,
-                'branch' : branch, 'licenceNr' : licenceNr}}, (err, users)=>{
+                'branch' : branch, 'licenceNr' : licenceNr, 'avatar' : avatar}}, (err, users)=>{
             if(err) console.log(err);
             else res.json({message : "changed"})
         })
@@ -478,8 +504,16 @@ export class UserController{
             licenceNr : req.body.licenceNr,
             type: 1,
             isApproved : true,
-            isRejected : false
+            isRejected : false,
+            avatar : req.body.avatar
         })
+
+        let profilePic = user.avatar
+        if(!profilePic) {
+            const pathPic = path.join(__dirname, '../../../frontend/app/src/assets/default-picture.jpg')
+            profilePic = fs.readFileSync(pathPic, 'base64')
+        }
+        user.avatar = profilePic
         
         let passwordconf = req.body.passwordconf;
 
@@ -567,6 +601,48 @@ export class UserController{
                 res.status(400).json({"message": "error"})
             }
             else res.json({"message": "ok"})
+        })
+    }
+
+    findAppointmentAndDelete = (req: express.Request, res: express.Response)=>{
+        let specializationApp = req.body.specialization
+        let AppointmentName = req.body.appointmentName
+        let Duration = req.body.appointmentDuration
+        let Price = req.body.appointmentPrice
+
+        AppointmentModel.deleteOne({'specializationApp' : specializationApp, 'AppointmentName' : AppointmentName, 'Duration' : Duration, 'Price' : Price}, (err, resp)=>{
+            if(err) {console.log(err);
+                res.status(400).json({"message": "error"})
+            }
+            else res.json({"message": "ok"})
+        })
+    }
+
+    updateAppointment = (req: express.Request, res: express.Response)=>{
+        let specializationApp = req.body.specialization
+        let AppointmentName = req.body.appointmentName
+        let Duration = req.body.appointmentDuration
+        let Price = req.body.appointmentPrice
+
+        AppointmentModel.findOneAndUpdate({'specializationApp' : specializationApp, 'AppointmentName' : AppointmentName},
+         {$set: {'Duration' : Duration, 'Price' : Price}}, (err, users)=>{
+            //console.log(users.appointmentName)
+            if(err) console.log(err);
+            else res.json({message : "changed"})
+        })
+    }
+
+    checkIfAppointmentExists = (req: express.Request, res: express.Response)=>{
+        let specializationApp = req.body.specialization
+        let AppointmentName = req.body.appointmentName
+
+        AppointmentModel.findOne({'specializationApp' : specializationApp, 'AppointmentName' : AppointmentName}, (err, users)=>{
+            //console.log(users.appointmentName)
+            if(err) console.log(err);
+            else if(users){ res.json({message : "ok"})
+            }else{
+                res.json({message : "not ok"})
+            }
         })
     }
 }

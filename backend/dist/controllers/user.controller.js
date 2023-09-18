@@ -18,6 +18,8 @@ const appointment_1 = __importDefault(require("../models/appointment"));
 const scheduled_1 = __importDefault(require("../models/scheduled"));
 const report_1 = __importDefault(require("../models/report"));
 const specialization_1 = __importDefault(require("../models/specialization"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 class UserController {
     constructor() {
         this.login = (req, res) => {
@@ -41,8 +43,15 @@ class UserController {
                 email: req.body.email,
                 type: 0,
                 isApproved: false,
-                isRejected: false
+                isRejected: false,
+                avatar: req.body.avatar
             });
+            let profilePic = user.avatar;
+            if (!profilePic) {
+                const pathPic = path_1.default.join(__dirname, '../../../frontend/app/src/assets/default-picture.jpg');
+                profilePic = fs_1.default.readFileSync(pathPic, 'base64');
+            }
+            user.avatar = profilePic;
             let passwordconf = req.body.passwordconf;
             user.save((err, resp) => {
                 if (err || user.password !== passwordconf) {
@@ -346,8 +355,11 @@ class UserController {
                             if (err) {
                                 console.log(err);
                             }
-                            else {
+                            else if (users) {
                                 res.json({ message: "Appointment added" });
+                            }
+                            else {
+                                res.status(404).json({ message: "User not found or appointment not updated" });
                             }
                         });
                     }
@@ -359,8 +371,8 @@ class UserController {
             let appointment = {
                 specializationApp: req.body.specializationApp,
                 AppointmentName: req.body.AppointmentName,
-                Duration: req.body.Duration,
-                Price: req.body.Price,
+                //Duration: req.body.Duration,
+                //Price: req.body.Price,
                 isChosen: req.body.isChosen
             };
             // Remove the appointment from the array
@@ -469,8 +481,15 @@ class UserController {
             let adress = req.body.adress;
             let email = req.body.email;
             let number = req.body.number;
+            let avatar = req.body.avatar;
+            let profilePic = avatar;
+            if (!profilePic) {
+                const pathPic = path_1.default.join(__dirname, '../../../frontend/app/src/assets/default-picture.jpg');
+                profilePic = fs_1.default.readFileSync(pathPic, 'base64');
+            }
+            avatar = profilePic;
             user_1.default.findOneAndUpdate({ 'username': username }, { $set: { 'firstname': firstname, 'lastname': lastname, 'adress': adress,
-                    'email': email, 'number': number } }, (err, users) => {
+                    'email': email, 'number': number, 'avatar': avatar } }, (err, users) => {
                 if (err)
                     console.log(err);
                 else
@@ -487,9 +506,16 @@ class UserController {
             let specialization = req.body.specialization;
             let branch = req.body.branch;
             let licenceNr = req.body.licenceNr;
+            let avatar = req.body.avatar;
+            let profilePic = avatar;
+            if (!profilePic) {
+                const pathPic = path_1.default.join(__dirname, '../../../frontend/app/src/assets/default-picture.jpg');
+                profilePic = fs_1.default.readFileSync(pathPic, 'base64');
+            }
+            avatar = profilePic;
             user_1.default.findOneAndUpdate({ 'username': username }, { $set: { 'firstname': firstname, 'lastname': lastname, 'adress': adress,
                     'email': email, 'number': number, 'specialization': specialization,
-                    'branch': branch, 'licenceNr': licenceNr } }, (err, users) => {
+                    'branch': branch, 'licenceNr': licenceNr, 'avatar': avatar } }, (err, users) => {
                 if (err)
                     console.log(err);
                 else
@@ -521,8 +547,15 @@ class UserController {
                 licenceNr: req.body.licenceNr,
                 type: 1,
                 isApproved: true,
-                isRejected: false
+                isRejected: false,
+                avatar: req.body.avatar
             });
+            let profilePic = user.avatar;
+            if (!profilePic) {
+                const pathPic = path_1.default.join(__dirname, '../../../frontend/app/src/assets/default-picture.jpg');
+                profilePic = fs_1.default.readFileSync(pathPic, 'base64');
+            }
+            user.avatar = profilePic;
             let passwordconf = req.body.passwordconf;
             user.save((err, resp) => {
                 if (err || user.password !== passwordconf) {
@@ -615,6 +648,48 @@ class UserController {
                 }
                 else
                     res.json({ "message": "ok" });
+            });
+        };
+        this.findAppointmentAndDelete = (req, res) => {
+            let specializationApp = req.body.specialization;
+            let AppointmentName = req.body.appointmentName;
+            let Duration = req.body.appointmentDuration;
+            let Price = req.body.appointmentPrice;
+            appointment_1.default.deleteOne({ 'specializationApp': specializationApp, 'AppointmentName': AppointmentName, 'Duration': Duration, 'Price': Price }, (err, resp) => {
+                if (err) {
+                    console.log(err);
+                    res.status(400).json({ "message": "error" });
+                }
+                else
+                    res.json({ "message": "ok" });
+            });
+        };
+        this.updateAppointment = (req, res) => {
+            let specializationApp = req.body.specialization;
+            let AppointmentName = req.body.appointmentName;
+            let Duration = req.body.appointmentDuration;
+            let Price = req.body.appointmentPrice;
+            appointment_1.default.findOneAndUpdate({ 'specializationApp': specializationApp, 'AppointmentName': AppointmentName }, { $set: { 'Duration': Duration, 'Price': Price } }, (err, users) => {
+                //console.log(users.appointmentName)
+                if (err)
+                    console.log(err);
+                else
+                    res.json({ message: "changed" });
+            });
+        };
+        this.checkIfAppointmentExists = (req, res) => {
+            let specializationApp = req.body.specialization;
+            let AppointmentName = req.body.appointmentName;
+            appointment_1.default.findOne({ 'specializationApp': specializationApp, 'AppointmentName': AppointmentName }, (err, users) => {
+                //console.log(users.appointmentName)
+                if (err)
+                    console.log(err);
+                else if (users) {
+                    res.json({ message: "ok" });
+                }
+                else {
+                    res.json({ message: "not ok" });
+                }
             });
         };
     }

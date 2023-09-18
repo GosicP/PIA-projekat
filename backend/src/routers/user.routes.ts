@@ -135,4 +135,16 @@ userRouter.route('/addSpecialization').post(
     (req, res) => new UserController().addSpecialization(req, res)
 )
 
+userRouter.route('/findAppointmentAndDelete').post(
+    (req, res) => new UserController().findAppointmentAndDelete(req, res)
+)
+
+userRouter.route('/updateAppointment').post(
+    (req, res) => new UserController().updateAppointment(req, res)
+)
+
+userRouter.route('/checkIfAppointmentExists').post(
+    (req, res) => new UserController().checkIfAppointmentExists(req, res)
+)
+
 export default userRouter;

@@ -47,6 +47,9 @@ let User = new Schema({
     },
     isRejected: {
         type: Boolean
+    },
+    avatar: {
+        type: String
     }
 });
 exports.default = mongoose_1.default.model('UserModel', User, 'users');
